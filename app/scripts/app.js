@@ -30,6 +30,22 @@ todoApp.factory('TaskList', function () {
     this.tasks.push(task);
   };
 
+  TaskList.prototype.count = function () {
+    return this.tasks.length;
+  };
+
+  TaskList.prototype.getOpenTasks = function () {
+    return this.tasks.filter(function (task) {
+      return !task.done;
+    });
+  };
+
+  TaskList.prototype.getFinishedTasks = function () {
+    return this.tasks.filter(function (task) {
+      return task.done;
+    });
+  };
+  
   return TaskList;
 });
 
@@ -51,3 +67,14 @@ todoApp.controller('todoListCtrl', function ($scope, TaskList, Task) {
   $scope.taskList.add(new Task('foo'));
 });
     
+
+
+
+/// TodoTable /////////////////////////////////////////////////////////////////
+
+todoApp.directive('todoTable', function () {
+  return {
+    restrict: 'C',
+    templateUrl: 'views/todo_table.html'
+  };
+});
