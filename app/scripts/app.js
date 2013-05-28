@@ -1,13 +1,35 @@
 'use strict';
 
-angular.module('todoApp', [])
-  .config(function ($routeProvider) {
-    $routeProvider
-      .when('/', {
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl'
-      })
-      .otherwise({
-        redirectTo: '/'
-      });
-  });
+var todoApp = angular.module('todoApp', []);
+
+
+
+
+/// Classes ///////////////////////////////////////////////////////////////////
+
+todoApp.factory('Task', function () {
+  function Task(name, due) {
+    this.name = name;
+    this.due  = due;
+    this.done = false;
+  }
+
+  Task.prototype.resolve = function () {
+    this.done = true;
+  };
+
+  return Task;
+});
+
+todoApp.factory('TaskList', function () {
+  function TaskList() {
+    this.tasks = [];
+  }
+
+  TaskList.prototype.add = function (task) {
+    this.tasks.push(task);
+  };
+
+  return TaskList;
+});
+
