@@ -5,16 +5,25 @@
     <tr>
       <th>Name</th>
       <th>Due</th>
+      <th width="10%">Actions</th>
     </tr>
   </thead>
   <tbody>
     <tr ng-repeat="task in taskList.getOpenTasks()" class="error">
       <td>{{task.name}}</td>
       <td>{{task.due}}</td>
+      <td>
+        <button class="btn btn-mini" ng-click="toggleTask(task)">Done</button>
+      </td>
     </tr>
     <tr ng-repeat="task in taskList.getFinishedTasks()" class="success">
       <td><strike>{{task.name}}</strike></td>
       <td><strike>{{task.due}}</strike></td>
+      <td>
+        <button class="btn btn-mini" ng-click="toggleTask(task)">Reopen</button>
+      </td>
     </tr>
   </tbody>
 </table>
+
+<button class="btn" ng-click="clearList()" ng-show="taskList.getFinishedTasks().length > 0">Clear</button>
