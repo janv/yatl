@@ -41,7 +41,13 @@ todoApp.factory('TaskList', function () {
 todoApp.directive('todoList', function () {
   return {
     restrict: 'E',
-    templateUrl: 'views/todo_list.html'
+    templateUrl: 'views/todo_list.html',
+    controller: 'todoListCtrl'
   };
 });
 
+todoApp.controller('todoListCtrl', function ($scope, TaskList, Task) {
+  $scope.taskList = new TaskList();
+  $scope.taskList.add(new Task('foo'));
+});
+    
