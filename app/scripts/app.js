@@ -1,5 +1,7 @@
 'use strict';
 
+window.Hoodie.prototype.checkConnection = function () {};
+
 var todoApp = angular.module('todoApp', []);
 
 
@@ -14,6 +16,20 @@ todoApp.factory('Task', function () {
     this.done = false;
   }
 
+  Task.load = function (data) {
+    var task = new Task(data.name, data.due);
+    task.done = data.done;
+    return task;
+  };
+
+  Task.prototype.dump = function () {
+    return {
+      name: this.name,
+      due: this.due,
+      done: this.done
+    };
+  };
+  
   Task.prototype.resolve = function () {
     this.done = true;
   };
@@ -21,11 +37,29 @@ todoApp.factory('Task', function () {
   return Task;
 });
 
-todoApp.factory('TaskList', function () {
+todoApp.factory('TaskList', function (Task) {
   function TaskList() {
     this.tasks = [];
   }
 
+  TaskList.load = function (data) {
+    var taskList = new TaskList();
+    taskList.id = data.id;
+    taskList.tasks = data.tasks.map(function (taskData) {
+      return Task.load(taskData);
+    });
+    return taskList;
+  };
+
+  TaskList.prototype.dump = function () {
+    return {
+      id: '123',
+      tasks: this.tasks.map(function (task) {
+        return task.dump();
+      })
+    };
+  };
+  
   TaskList.prototype.add = function (task) {
     this.tasks.push(task);
   };
@@ -61,6 +95,32 @@ todoApp.factory('TaskList', function () {
 
 
 
+/// Hoodie ///////////////////////////////////////////////////////////////////
+
+todoApp.factory('hoodie', function () {
+  return new window.Hoodie();
+});
+
+todoApp.factory('store', function (hoodie, $q, TaskList) {
+  return {
+    save: function (taskList) {
+      return $q.when(hoodie.store.add('tasklist', taskList.dump()));
+    },
+    load: function () {
+      return $q.when(
+        hoodie.store.findAll('tasklist').then(function (tasklists) {
+          if (tasklists.length === 0) { return undefined; }
+          return TaskList.load(tasklists[0]);
+        })
+      );
+    }
+  };
+});
+
+
+
+
+
 /// TodoList //////////////////////////////////////////////////////////////////
 
 todoApp.directive('todoList', function () {
@@ -71,9 +131,23 @@ todoApp.directive('todoList', function () {
   };
 });
 
-todoApp.controller('todoListCtrl', function ($scope, TaskList, Task) {
+todoApp.controller('todoListCtrl', function ($scope, TaskList, store) {
   $scope.taskList = new TaskList();
-  $scope.taskList.add(new Task('foo'));
+  store.load().then(function (taskList) {
+    if (taskList) { $scope.taskList = taskList; }
+  });
+
+  function persistTodoList() {
+    store.save($scope.taskList).then(function (x) {
+      console.log('save success', x);
+    }, function (x) {
+      console.log('save fail', x);
+    });
+  }
+
+  $scope.$on('taskAdded', persistTodoList);
+  $scope.$on('taskChanged', persistTodoList);
+  $scope.$on('listCleared', persistTodoList);
 });
     
 
@@ -116,10 +190,12 @@ todoApp.directive('todoTable', function () {
 todoApp.controller('todoTableCtrl', function ($scope) {
   $scope.toggleTask = function (task) {
     task.done = !task.done;
+    $scope.$emit('taskChanged', task);
   };
 
   $scope.clearList = function () {
     $scope.taskList.clear();
+    $scope.$emit('listCleared');
   };
 });
 
