@@ -33,3 +33,15 @@ todoApp.factory('TaskList', function () {
   return TaskList;
 });
 
+
+
+
+/// TodoList //////////////////////////////////////////////////////////////////
+
+todoApp.directive('todoList', function () {
+  return {
+    restrict: 'E',
+    templateUrl: 'views/todo_list.html'
+  };
+});
+
