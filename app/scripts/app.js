@@ -79,6 +79,30 @@ todoApp.controller('todoListCtrl', function ($scope, TaskList, Task) {
 
 
 
+
+/// TodoForm //////////////////////////////////////////////////////////////////
+
+todoApp.directive('todoForm', function () {
+  return {
+    restrict: 'C',
+    templateUrl: 'views/todo_form.html',
+    controller: 'todoFormCtrl'
+  };
+});
+
+todoApp.controller('todoFormCtrl', function ($scope, Task) {
+  $scope.newTask = new Task();
+
+  $scope.addTask = function () {
+    $scope.taskList.add($scope.newTask);
+    $scope.$emit('taskAdded', $scope.newTask);
+    $scope.newTask = new Task();
+  };
+});
+
+
+
+
 /// TodoTable /////////////////////////////////////////////////////////////////
 
 todoApp.directive('todoTable', function () {

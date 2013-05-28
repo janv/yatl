@@ -1,0 +1,11 @@
+<h2>New Task</h2>
+<form name="newTaskForm" ng-submit="addTask()" class="well">
+  <label for="taskname">Name</label>
+  <input type="text" name="taskname" ng-model="newTask.name" required="true">
+
+  <label for="duedate">Due Date</label>
+  <input type="date" name="duedate"  ng-model="newTask.due">
+  <span class="help-block">(optional)</span>
+
+  <button type="submit" class="btn btn-primary" ng-disabled="newTaskForm.$invalid">Add Task</button>
+</form>
